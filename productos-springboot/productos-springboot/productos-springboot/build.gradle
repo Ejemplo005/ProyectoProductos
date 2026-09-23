@@ -1,0 +1,44 @@
+// ============================================================
+//  build.gradle — Tienda de Productos con Spring Boot + Thymeleaf
+// ============================================================
+// A diferencia del proyecto "productos-jpa" (JPA puro, sin Spring), acá
+// usamos Spring Boot completo: además de Spring Data JPA, agregamos
+// Spring Web (API/servidor) y Spring Thymeleaf (motor de plantillas HTML).
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.productos'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JPA + Hibernate + JpaRepository (reemplaza al GenericRepository a mano)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // Servidor web embebido (Tomcat) + @Controller/@RestController
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Motor de plantillas: permite que el HTML muestre datos que vienen de Java
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    runtimeOnly 'com.h2database:h2'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

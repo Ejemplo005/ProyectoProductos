@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administración — Aguas Astrales</title>
+  <link rel="icon" type="image/png" th:href="@{/images/logo-aa.png}">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+  <header>
+    <a class="brand-link" th:href="@{/}">
+      <img class="brand-logo" th:src="@{/images/logo-aa.png}" alt="Logo Aguas Astrales">
+      <div class="brand">Aguas<span>Astrales</span></div>
+    </a>
+    <nav>
+      <a th:href="@{/}">← Volver a la tienda</a>
+    </nav>
+  </header>
+
+  <div class="admin-card">
+    <div class="admin-card-header">
+      <div class="eyebrow">Panel de control</div>
+      <h2>Administrar productos</h2>
+    </div>
+
+    <div class="panel-body">
+      <!-- Un mismo formulario sirve para ALTA y EDICIÓN:
+           - Si "producto.id" es null, el título dice "Agregar producto".
+           - Si ya tiene id (vinimos de /admin/editar/{id}), dice "Editar producto"
+             y los campos vienen precargados con th:value / th:text. -->
+      <form class="form-box" th:action="@{/admin/guardar}" method="post">
+        <h3 th:text="${producto.id == null} ? 'Agregar producto' : 'Editar producto'">Agregar producto</h3>
+
+        <!-- Solo mandamos el id si estamos editando: si el campo no está
+             presente, @RequestParam(required = false) Long id llega como
+             null (evita problemas de convertir texto vacío a Long). -->
+        <input type="hidden" name="id" th:if="${producto.id != null}" th:value="${producto.id}">
+
+        <div class="form-field">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" th:value="${producto.nombre}" required maxlength="150" placeholder="Ej. Vela de sándalo">
+        </div>
+
+        <div class="form-field">
+          <label for="categoriaId">Categoría</label>
+          <select id="categoriaId" name="categoriaId" required>
+            <option th:each="categoria : ${categorias}"
+                    th:value="${categoria.id}"
+                    th:text="${categoria.nombre}"
+                    th:selected="${producto.categoria != null and producto.categoria.id == categoria.id}">
+              Categoría
+            </option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="precio">Precio (ARS)</label>
+          <input id="precio" name="precio" type="number" min="0" step="1" th:value="${producto.precio}" required placeholder="0">
+        </div>
+
+        <div class="form-field">
+          <label for="stock">Stock</label>
+          <input id="stock" name="stock" type="number" min="0" step="1" th:value="${producto.stock}" required placeholder="0">
+        </div>
+
+        <div class="form-field">
+          <label for="imagenUrl">Imagen</label>
+          <input id="imagenUrl" name="imagenUrl" th:value="${producto.imagenUrl}" placeholder="/images/producto.jpeg">
+        </div>
+
+        <div class="form-field">
+          <label for="descripcion">Descripción</label>
+          <textarea id="descripcion" name="descripcion" required maxlength="500"
+                    placeholder="Una breve descripción" th:text="${producto.descripcion}"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="primary" type="submit">Guardar producto</button>
+          <a class="secondary" th:href="@{/admin}">Cancelar</a>
+        </div>
+      </form>
+
+      <div>
+        <h3 style="margin:0 0 16px">Catálogo actual</h3>
+        <div class="admin-list">
+          <p th:if="${productos.isEmpty()}" style="color:#667085">No hay productos cargados.</p>
+
+          <div class="admin-row" th:each="p : ${productos}">
+            <img class="admin-thumb" th:src="@{${p.imagenUrl} ?: '/images/logo-aa.png'}" alt="">
+            <div>
+              <div class="admin-name" th:text="${p.nombre}">Nombre</div>
+              <div class="admin-meta"
+                   th:text="${p.categoria.nombre} + ' · $' + ${#numbers.formatDecimal(p.precio, 1, 0)} + ' · stock: ' + ${p.stock}">
+                Categoría · $0 · stock: 0
+              </div>
+            </div>
+            <div class="row-actions">
+              <a class="edit" th:href="@{/admin/editar/{id}(id=${p.id})}">Editar</a>
+              <!-- Un DELETE "real" de HTTP no se puede mandar desde un
+                   <a>, por eso usamos un mini-formulario POST solo para
+                   borrar (patrón muy común en apps con Thymeleaf). -->
+              <form th:action="@{/admin/eliminar/{id}(id=${p.id})}" method="post" style="display:inline">
+                <button class="delete" type="submit"
+                        onclick="return confirm('¿Eliminar este producto?');">Eliminar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

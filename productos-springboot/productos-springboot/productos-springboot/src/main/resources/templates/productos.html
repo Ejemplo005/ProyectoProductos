@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aguas Astrales - tienda de productos aromáticos y de bienestar.">
+  <title>Aguas Astrales — Tienda</title>
+  <link rel="icon" type="image/png" th:href="@{/images/logo-aa.png}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+  <header>
+    <a class="brand-link" th:href="@{/}">
+      <img class="brand-logo" th:src="@{/images/logo-aa.png}" alt="Logo Aguas Astrales">
+      <div class="brand">Aguas<span>Astrales</span></div>
+    </a>
+    <nav>
+      <a href="#productos">Productos</a>
+      <a href="#nosotros">Nosotros</a>
+      <a class="admin-toggle" th:href="@{/admin}">Administrador</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Aguas Astrales · confort</div>
+      <h1>Lo esencial es invisible a los ojos.</h1>
+      <p class="hero-copy">Una selección de productos pensados para acompañar las pequeñas rutinas y hacerlas un poco más especiales.</p>
+    </div>
+
+    <div class="hero-card">
+      <img class="hero-logo" th:src="@{/images/logo-aa.png}" alt="Logo Aguas Astrales">
+      <div class="big">AGUAS<br>ASTRALES</div>
+      <p>Vida, mejorada.</p>
+    </div>
+  </section>
+
+  <main id="productos">
+    <div class="section-head">
+      <h2>Productos destacados</h2>
+      <!-- |...| es "sustitución literal": permite mezclar texto fijo y
+           expresiones ${...} sin tener que concatenar con +. -->
+      <span class="count" th:text="|${productos.size()} productos|">0 productos</span>
+    </div>
+
+    <div class="products">
+      <!-- th:if solo renderiza este div si la condición es verdadera -->
+      <div class="empty" th:if="${productos.isEmpty()}">
+        Todavía no hay productos cargados. Podés agregar uno desde el panel de administración.
+      </div>
+
+      <!-- th:each recorre la lista "productos" que llega desde el Controller,
+           repitiendo este <article> una vez por cada producto. El operador
+           ?: (Elvis) muestra el logo si el producto no tiene imagen cargada. -->
+      <article class="product" th:each="producto : ${productos}">
+        <img class="photo" th:src="@{${producto.imagenUrl} ?: '/images/logo-aa.png'}" th:alt="${producto.nombre}">
+        <div class="product-content">
+          <div class="tag" th:text="${producto.categoria.nombre}">Categoría</div>
+          <h3 th:text="${producto.nombre}">Nombre del producto</h3>
+          <p class="product-description" th:text="${producto.descripcion}">Descripción</p>
+          <div class="product-bottom">
+            <span class="price" th:text="|$${#numbers.formatDecimal(producto.precio, 1, 0)}|">$0</span>
+            <span class="stock-info" th:text="|Stock: ${producto.stock}|">Stock: 0</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer id="nosotros">Aguas Astrales · Tienda pensada para vos</footer>
+
+</body>
+</html>
